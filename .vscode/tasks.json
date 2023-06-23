@@ -1,0 +1,71 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "zip",
+            "type": "shell",
+            "windows": {
+                "command": "${workspaceFolder}/.vscode/zip.ps1"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "copy to server",
+            "type": "shell",
+            "command": "scp",
+            "problemMatcher": [],
+            "args": [
+                "MakeSuspicious.zip.zip",
+                "${input:server}:${input:folder}",
+            ],
+            "dependsOn":[
+                "zip"
+            ],
+            "options": {
+                "statusbar": {
+                    "hide": true,
+                }
+            }
+        },
+        {
+            "label": "reload",
+            "type": "shell",
+            "command": "ssh",
+            "args": [
+                "${input:server}",
+                "screen -x mc -X stuff 'reload^M'",
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "focus": true,
+            },
+            "dependsOn":[
+                "copy to server"
+            ]
+        },
+    ],
+    "inputs": [
+        {
+            "id": "server",
+            "type": "command",
+            "command": "memento.promptString",
+            "args": {
+                "id": "server",
+                "description": "Target IP address",
+                "default": "mc@oracle.lan",
+            }
+        },
+        {
+            "id": "folder",
+            "type": "command",
+            "command": "memento.promptString",
+            "args": {
+                "id": "folder",
+                "description": "Remote Folder",
+                "default": "forge/alexis/world/datapacks/",
+            }
+        },
+    ]
+}
